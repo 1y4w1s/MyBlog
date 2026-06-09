@@ -1,0 +1,6 @@
+com\my\blog\controller\CategoryController.class
+com\my\blog\controller\CommentController.class
+com\my\blog\controller\ArticleController.class
+com\my\blog\BlogApplication.class
+com\my\blog\controller\UserController.class
+com\my\blog\controller\LinkController.class
