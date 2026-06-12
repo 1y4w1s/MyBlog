@@ -13,7 +13,7 @@ import java.util.UUID;
 @Component
 public class QiniuUtils {
 
-    @Value("${qiniu.domain}")
+    @Value("${oss.domain}")
     private String domain;
 
     @Value("${server.port}")

@@ -14,6 +14,7 @@ import com.my.blog.utils.BeanCopyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,6 +37,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         Set<Long> categoryIds = articleList.stream()
                 .map(article -> article.getCategoryId())
                 .collect(Collectors.toSet());
+
+        // 如果分类ID集合为空，直接返回空列表，避免生成 WHERE id IN ( ) 的无效SQL
+        if (categoryIds.isEmpty()) {
+            return ResponseResult.okResult(Collections.emptyList());
+        }
 
         List<Category> categories = categoryMapper.selectBatchIds(categoryIds);
         categories = categories.stream()

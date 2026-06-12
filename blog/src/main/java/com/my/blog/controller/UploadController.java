@@ -1,7 +1,7 @@
 package com.my.blog.controller;
 
 import com.my.blog.domain.ResponseResult;
-import com.my.blog.utils.QiniuUtils;
+import com.my.blog.service.UploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,16 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class UploadController {
 
     @Autowired
-    private QiniuUtils qiniuUtils;
+    private UploadService uploadService;
 
     @PostMapping("/upload")
-    public ResponseResult upload(MultipartFile img) {
-        try {
-            String url = qiniuUtils.upload(img);
-            return ResponseResult.okResult(url);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseResult.errorResult(500, "上传失败");
-        }
+    public ResponseResult uploadImg(MultipartFile img) {
+        return uploadService.uploadImg(img);
     }
 }

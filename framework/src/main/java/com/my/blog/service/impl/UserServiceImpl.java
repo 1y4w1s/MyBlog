@@ -1,5 +1,6 @@
 package com.my.blog.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.my.blog.dao.UserMapper;
 import com.my.blog.domain.entity.User;
@@ -7,6 +8,7 @@ import com.my.blog.domain.entity.LoginUser;
 import com.my.blog.domain.vo.BlogUserLoginVo;
 import com.my.blog.domain.vo.UserInfoVo;
 import com.my.blog.domain.ResponseResult;
+import com.my.blog.enums.AppHttpCodeEnum;
 import com.my.blog.service.IUserService;
 import com.my.blog.utils.BeanCopyUtils;
 import com.my.blog.utils.JwtUtil;
@@ -18,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -75,11 +78,55 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     
     @Override
     public ResponseResult register(User user) {
+        // 非空校验
+        if (!StringUtils.hasText(user.getUserName())) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.USERNAME_NOT_NULL);
+        }
+        if (!StringUtils.hasText(user.getNickName())) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.NICKNAME_NOT_NULL);
+        }
+        if (!StringUtils.hasText(user.getPassword())) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.PASSWORD_NOT_NULL);
+        }
+        if (!StringUtils.hasText(user.getEmail())) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.EMAIL_NOT_NULL);
+        }
+
+        // 重复性校验
+        if (userNameExist(user.getUserName())) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.USERNAME_EXIST);
+        }
+        if (nickNameExist(user.getNickName())) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.NICKNAME_EXIST);
+        }
+        if (emailExist(user.getEmail())) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.EMAIL_EXIST);
+        }
+
+        // 使用PasswordEncoder进行密文加密
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setType("0");
         user.setStatus("0");
         save(user);
         return ResponseResult.okResult();
+    }
+
+    private boolean userNameExist(String userName) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getUserName, userName);
+        return count(queryWrapper) > 0;
+    }
+
+    private boolean nickNameExist(String nickName) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getNickName, nickName);
+        return count(queryWrapper) > 0;
+    }
+
+    private boolean emailExist(String email) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getEmail, email);
+        return count(queryWrapper) > 0;
     }
     
     @Override

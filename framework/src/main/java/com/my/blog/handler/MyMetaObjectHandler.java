@@ -15,21 +15,39 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
     public void insertFill(MetaObject metaObject) {
         this.setFieldValByName("createTime", LocalDateTime.now(), metaObject);
         this.setFieldValByName("updateTime", LocalDateTime.now(), metaObject);
-        
-        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (loginUser != null && loginUser.getUser() != null) {
-            this.setFieldValByName("createBy", loginUser.getUser().getId(), metaObject);
-            this.setFieldValByName("updateBy", loginUser.getUser().getId(), metaObject);
-        }
+        setCreateAndUpdate(metaObject);
     }
-    
+
     @Override
     public void updateFill(MetaObject metaObject) {
         this.setFieldValByName("updateTime", LocalDateTime.now(), metaObject);
-        
-        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (loginUser != null && loginUser.getUser() != null) {
-            this.setFieldValByName("updateBy", loginUser.getUser().getId(), metaObject);
+        setUpdateBy(metaObject);
+    }
+
+    private void setCreateAndUpdate(MetaObject metaObject) {
+        try {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (principal instanceof LoginUser) {
+                LoginUser loginUser = (LoginUser) principal;
+                if (loginUser.getUser() != null) {
+                    this.setFieldValByName("createBy", loginUser.getUser().getId(), metaObject);
+                    this.setFieldValByName("updateBy", loginUser.getUser().getId(), metaObject);
+                }
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void setUpdateBy(MetaObject metaObject) {
+        try {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (principal instanceof LoginUser) {
+                LoginUser loginUser = (LoginUser) principal;
+                if (loginUser.getUser() != null) {
+                    this.setFieldValByName("updateBy", loginUser.getUser().getId(), metaObject);
+                }
+            }
+        } catch (Exception ignored) {
         }
     }
 }
