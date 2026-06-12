@@ -16,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -37,6 +38,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     
     @Autowired
     private RedisCache redisCache;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public ResponseResult login(User user) {
@@ -66,6 +70,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
         Long userid = loginUser.getUser().getId();
         redisCache.deleteObject("bloglogin:" + userid);
+        return ResponseResult.okResult();
+    }
+    
+    @Override
+    public ResponseResult register(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setType("0");
+        user.setStatus("0");
+        save(user);
+        return ResponseResult.okResult();
+    }
+    
+    @Override
+    public ResponseResult userInfo(Long userId) {
+        User user = getById(userId);
+        UserInfoVo userInfoVo = BeanCopyUtils.copyBean(user, UserInfoVo.class);
+        return ResponseResult.okResult(userInfoVo);
+    }
+    
+    @Override
+    public ResponseResult updateUserInfo(User user) {
+        updateById(user);
         return ResponseResult.okResult();
     }
 }

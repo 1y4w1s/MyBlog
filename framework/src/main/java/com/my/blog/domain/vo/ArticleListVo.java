@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 @Data
 public class ArticleListVo {
     private Long id;
+    private Long categoryId;
     private String title;
     private String summary;
     private String categoryName;

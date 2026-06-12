@@ -15,4 +15,7 @@ import com.my.blog.domain.ResponseResult;
 public interface IUserService extends IService<User> {
     ResponseResult login(User user);
     ResponseResult logout();
+    ResponseResult register(User user);
+    ResponseResult userInfo(Long userId);
+    ResponseResult updateUserInfo(User user);
 }

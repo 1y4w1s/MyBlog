@@ -72,9 +72,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
            ArticleListVo articleListVo = new ArticleListVo();
            BeanUtils.copyProperties(article, articleListVo);
 
-           Category category = categoryMapper.selectById(article.getCategoryId());
-           String name = category.getName();
-           articleListVo.setCategoryName(name);
+            articleListVo.setCategoryId(article.getCategoryId());
+            Category category = categoryMapper.selectById(article.getCategoryId());
+            String name = category.getName();
+            articleListVo.setCategoryName(name);
 
            articleListVos.add(articleListVo);
        }
@@ -94,6 +95,17 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         articleDetailVo.setCategoryName(name);
 
         return ResponseResult.okResult(articleDetailVo);
+    }
+
+    @Override
+    public ResponseResult updateViewCount(Long id) {
+        Article article = articleMapper.selectById(id);
+        if (article == null) {
+            return ResponseResult.errorResult(404, "文章不存在");
+        }
+        article.setViewCount(article.getViewCount() == null ? 1 : article.getViewCount() + 1);
+        articleMapper.updateById(article);
+        return ResponseResult.okResult();
     }
 }
 

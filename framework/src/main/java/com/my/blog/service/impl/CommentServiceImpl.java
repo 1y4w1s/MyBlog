@@ -8,11 +8,14 @@ import com.my.blog.dao.CommentMapper;
 import com.my.blog.dao.UserMapper;
 import com.my.blog.domain.ResponseResult;
 import com.my.blog.domain.entity.Comment;
+import com.my.blog.domain.entity.LoginUser;
+import com.my.blog.domain.entity.User;
 import com.my.blog.domain.vo.CommentVo;
 import com.my.blog.domain.vo.PageVo;
 import com.my.blog.service.ICommentService;
 import com.my.blog.utils.BeanCopyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,12 +50,18 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     private List<CommentVo> toCommentVoList(List<Comment> list){
         List<CommentVo> commentVos = BeanCopyUtils.copyBeanList(list, CommentVo.class);
         for (CommentVo commentVo : commentVos){
-            String nickName = userMapper.selectById(commentVo.getCreateBy()).getNickName();
-            commentVo.setUsername(nickName);
+            if (commentVo.getCreateBy() != null) {
+                User user = userMapper.selectById(commentVo.getCreateBy());
+                if (user != null) {
+                    commentVo.setUsername(user.getNickName());
+                }
+            }
             
-            if(commentVo.getToCommentId() != -1){
-                String toCommentUserName = userMapper.selectById(commentVo.getToCommentUserId()).getNickName();
-                commentVo.setToCommentUserName(toCommentUserName);
+            if (commentVo.getToCommentId() != null && commentVo.getToCommentUserId() != null && commentVo.getToCommentId() != -1){
+                User toUser = userMapper.selectById(commentVo.getToCommentUserId());
+                if (toUser != null) {
+                    commentVo.setToCommentUserName(toUser.getNickName());
+                }
             }
         }
         return commentVos;
