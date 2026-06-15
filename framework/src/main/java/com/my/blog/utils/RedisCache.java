@@ -106,6 +106,10 @@ public class RedisCache {
         return doRedis(() -> { HashOperations<String, String, T> op = redisTemplate.opsForHash(); return op.get(key, hKey); }, null);
     }
 
+    public void incrementCacheMapValue(String key, String hKey, long value) {
+        doRedisVoid(() -> redisTemplate.opsForHash().increment(key, hKey, value));
+    }
+
     public <T> List<T> getMultiCacheMapValue(final String key, final Collection<Object> hKeys) {
         return doRedis(() -> redisTemplate.opsForHash().multiGet(key, hKeys), null);
     }

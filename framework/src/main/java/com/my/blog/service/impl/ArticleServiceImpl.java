@@ -14,6 +14,7 @@ import com.my.blog.domain.vo.ArticleListVo;
 import com.my.blog.domain.vo.HotArticleVo;
 import com.my.blog.domain.vo.PageVo;
 import com.my.blog.service.IArticleService;
+import com.my.blog.utils.RedisCache;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Autowired
     private CategoryMapper categoryMapper;
+
+    @Autowired
+    private RedisCache redisCache;
 
     @Override
     public ResponseResult hotArticleList() {
@@ -90,21 +94,20 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         ArticleDetailVo articleDetailVo = new ArticleDetailVo();
         BeanUtils.copyProperties(article, articleDetailVo);
 
+        Long viewCount = redisCache.getCacheMapValue("article:viewCount", id.toString());
+        articleDetailVo.setViewCount(viewCount != null ? viewCount : article.getViewCount());
+
         Category category = categoryMapper.selectById(article.getCategoryId());
-        String name = category.getName();
-        articleDetailVo.setCategoryName(name);
+        if (category != null) {
+            articleDetailVo.setCategoryName(category.getName());
+        }
 
         return ResponseResult.okResult(articleDetailVo);
     }
 
     @Override
     public ResponseResult updateViewCount(Long id) {
-        Article article = articleMapper.selectById(id);
-        if (article == null) {
-            return ResponseResult.errorResult(404, "文章不存在");
-        }
-        article.setViewCount(article.getViewCount() == null ? 1 : article.getViewCount() + 1);
-        articleMapper.updateById(article);
+        redisCache.incrementCacheMapValue("article:viewCount", id.toString(), 1);
         return ResponseResult.okResult();
     }
 }
