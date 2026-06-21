@@ -18,6 +18,7 @@ import com.my.blog.utils.RedisCache;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,6 +110,20 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public ResponseResult updateViewCount(Long id) {
         redisCache.incrementCacheMapValue("article:viewCount", id.toString(), 1);
         return ResponseResult.okResult();
+    }
+
+    @Override
+    public ResponseResult getAdminArticleList(Integer pageNum, Integer pageSize, String title, String summary) {
+        LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(StringUtils.hasText(title), Article::getTitle, title)
+                .like(StringUtils.hasText(summary), Article::getSummary, summary)
+                .orderByDesc(Article::getCreateTime);
+
+        Page<Article> page = new Page<>(pageNum, pageSize);
+        articleMapper.selectPage(page, queryWrapper);
+
+        PageVo pageVo = new PageVo(page.getRecords(), page.getTotal());
+        return ResponseResult.okResult(pageVo);
     }
 }
 

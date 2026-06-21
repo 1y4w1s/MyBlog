@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface MenuMapper extends BaseMapper<Menu> {
     List<String> getPerms(Long userId);
+
+    List<Menu> getMenus(Long userId);
 }

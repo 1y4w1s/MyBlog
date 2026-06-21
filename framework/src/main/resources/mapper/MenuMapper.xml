@@ -15,4 +15,16 @@
             sm.status = 0 and
             sm.del_flag = 0
     </select>
+
+    <select id="getMenus" resultType="com.my.blog.domain.entity.Menu">
+        SELECT DISTINCT sm.*
+        FROM sys_user_role sur
+        LEFT JOIN sys_role_menu srm ON sur.role_id = srm.role_id
+        LEFT JOIN sys_menu sm ON srm.menu_id = sm.id
+        WHERE sur.user_id = #{userId}
+          AND sm.menu_type IN ('C', 'M')
+          AND sm.status = 0
+          AND sm.del_flag = 0
+        ORDER BY sm.parent_id, sm.order_num
+    </select>
 </mapper>

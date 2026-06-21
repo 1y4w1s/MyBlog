@@ -3,23 +3,17 @@ package com.my.blog.service.impl;
 import com.my.blog.domain.ResponseResult;
 import com.my.blog.domain.entity.LoginUser;
 import com.my.blog.domain.entity.User;
-import com.my.blog.domain.vo.AdminUserInfoVo;
-import com.my.blog.domain.vo.UserInfoVo;
 import com.my.blog.service.IAdminLoginService;
-import com.my.blog.service.IMenuService;
-import com.my.blog.service.IRoleService;
-import com.my.blog.utils.BeanCopyUtils;
 import com.my.blog.utils.JwtUtil;
 import com.my.blog.utils.RedisCache;
+import com.my.blog.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -32,12 +26,6 @@ public class AdminLoginServiceImpl implements IAdminLoginService {
 
     @Autowired
     private RedisCache redisCache;
-
-    @Autowired
-    private IMenuService menuService;
-
-    @Autowired
-    private IRoleService roleService;
 
     @Override
     public ResponseResult login(User user) {
@@ -61,16 +49,10 @@ public class AdminLoginServiceImpl implements IAdminLoginService {
     }
 
     @Override
-    public ResponseResult getInfo() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        LoginUser loginUser = (LoginUser) authentication.getPrincipal();
-        User user = loginUser.getUser();
-
-        List<String> perms = menuService.getPerms(user.getId());
-        List<String> roles = roleService.getRoleKey(user.getId());
-        UserInfoVo userInfoVo = BeanCopyUtils.copyBean(user, UserInfoVo.class);
-        AdminUserInfoVo adminUserInfoVo = new AdminUserInfoVo(perms, roles, userInfoVo);
-
-        return ResponseResult.okResult(adminUserInfoVo);
+    public ResponseResult logout() {
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        Long userId = loginUser.getUser().getId();
+        redisCache.deleteObject("adminlogin:" + userId);
+        return ResponseResult.okResult();
     }
 }

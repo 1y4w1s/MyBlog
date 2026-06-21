@@ -6,11 +6,7 @@ import com.my.blog.service.IArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -47,6 +43,24 @@ public class ArticleController {
     @PutMapping("/updateViewCount/{id}")
     public ResponseResult updateViewCount(@PathVariable("id") Long id) {
         return articleService.updateViewCount(id);
+    }
+
+    @PostMapping
+    public ResponseResult add(@RequestBody Article article) {
+        articleService.save(article);
+        return ResponseResult.okResult();
+    }
+
+    @PutMapping
+    public ResponseResult update(@RequestBody Article article) {
+        articleService.updateById(article);
+        return ResponseResult.okResult();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseResult del(@PathVariable Long id) {
+        articleService.removeById(id);
+        return ResponseResult.okResult();
     }
 
     @GetMapping("/")
