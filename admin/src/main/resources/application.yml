@@ -1,0 +1,31 @@
+server:
+  port: 8989
+
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/blog?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+  servlet:
+    multipart:
+        max-file-size: 2MB
+        max-request-size: 5MB
+  redis:
+    host: localhost
+    port: 6379
+
+oss:
+  accessKey: ydgGGQbL1A9U2_YvNUXaiyJrFrAg-gE0L9W6lc8L
+  secretKey: 4k5bwwd9WNKOe3mpb1QoI-RG6gG_UNEfEibGRj4t
+  bucket: put-jiale-demo
+  domain: http://tgirwha1m.hn-bkt.clouddn.com
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: delFlag
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      id-type: auto
