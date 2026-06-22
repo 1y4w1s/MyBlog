@@ -1,0 +1,34 @@
+# Maven
+target/
+*.jar
+*.war
+*.ear
+*.class
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Node / Vue
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs & runtime
+*.log
+uploads/
+jar_temp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local config (copy from *.example.yml)
+application-local.yml
