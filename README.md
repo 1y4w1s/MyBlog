@@ -1,4 +1,4 @@
-# 博客管理系统（含前台 + 后台管理）
+# 博客管理系统
 
 基于 Spring Boot + Vue 的博客系统，包含前台博客展示和后台管理功能。
 
@@ -9,72 +9,170 @@
 ├── admin/                 # 后台管理后端（端口 8989）
 ├── framework/             # 公共模块（实体、服务、工具类）
 ├── admin-vue/             # 后台管理前端（端口 9528）
-├── fronted/               # 博客前台前端（端口 8080）
-└── pom.xml                # Maven 父工程
+│   ├── dist/              # 已编译，可直接使用
+│   └── src/               # 前端源码
+├── fronted/
+│   └── ptu-blog-vue/      # 博客前台前端（端口 8080）
+│       ├── dist/          # 已编译，可直接使用
+│       └── src/           # 前端源码
+├── blog/sql/blog.sql      # 数据库初始化脚本
+└── README.md
 ```
 
 ## 环境要求
 
-- JDK 8+
-- Maven 3.6+
-- MySQL 8.0+
-- Redis
-- Node.js（前台前端需要，后台前端可直接用 dist）
+| 环境 | 版本 | 说明 |
+|------|------|------|
+| JDK | 8+ | 必需 |
+| Maven | 3.6+ | 必需 |
+| MySQL | 8.0+ | 必需 |
+| Redis | 任意 | 必需，用于登录Token存储 |
+| Node.js | 14-16 | 前台前端开发用（用 dist 不需要） |
 
-## 快速启动
+## 从零开始使用步骤
 
-### 1. 数据库初始化
+### 第一步：克隆项目
 
-```sql
-CREATE DATABASE blog DEFAULT CHARACTER SET utf8mb4;
+```bash
+git clone -b 11.Tag管理、发博文 https://github.com/1y4w1s/MyBlog.git
+cd MyBlog
 ```
 
-然后导入初始化脚本（包含建表 + 初始数据）：
+### 第二步：初始化数据库
+
 ```bash
+# 登录 MySQL 创建数据库
+mysql -u root -p
+
+# 在 MySQL 命令行中执行：
+CREATE DATABASE blog DEFAULT CHARACTER SET utf8mb4;
+exit;
+
+# 导入初始化脚本（包含建表语句和初始数据）
 mysql -u root -p blog < blog/sql/blog.sql
 ```
 
-### 2. 启动 Redis
+初始化脚本包含：
+- 9 张表的建表语句
+- admin 管理员账号（用户名: admin，密码: 123456）
+- 默认角色和菜单数据
+- 示例文章、分类、友链、评论数据
 
-```bash
-redis-server
+### 第三步：修改数据库密码（如需要）
+
+编辑以下两个文件，将 `password` 改为你的 MySQL 密码：
+
+```yaml
+# blog/src/main/resources/application.yml
+spring:
+  datasource:
+    password: 123456  # 改成你的密码
+
+# admin/src/main/resources/application.yml
+spring:
+  datasource:
+    password: 123456  # 改成你的密码
 ```
 
-### 3. 启动后端
+### 第四步：启动 Redis
 
 ```bash
-# 编译打包（跳过测试）
-mvn clean package -DskipTests
+# Windows
+redis-server
 
-# 启动博客后端（端口 7777）
+# 或者指定配置文件启动
+redis-server redis.windows.conf
+```
+
+### 第五步：编译后端
+
+```bash
+# 在项目根目录执行
+mvn clean package -DskipTests
+```
+
+编译成功后会在以下目录生成 jar 包：
+- `admin/target/admin-1.0-SNAPSHOT.jar`
+- `blog/target/blog-1.0-SNAPSHOT.jar`
+
+### 第六步：启动后端服务
+
+需要开两个终端窗口：
+
+```bash
+# 终端 1 - 启动博客后端（端口 7777）
 java -jar blog/target/blog-1.0-SNAPSHOT.jar
 
-# 启动管理后台后端（端口 8989）
+# 终端 2 - 启动管理后台后端（端口 8989）
 java -jar admin/target/admin-1.0-SNAPSHOT.jar
 ```
 
-### 4. 启动前端
+### 第七步：启动前端
 
 ```bash
-# 后台管理前端（推荐直接用 dist，无需 npm install）
+# 后台管理前端（端口 9528）
 cd admin-vue/dist
 npx serve -l 9528
-# 或者用 Node 简易服务器
-node serve.js
 
-# 博客前台前端
+# 博客前台前端（端口 8080）
 cd fronted/ptu-blog-vue
 node serve.js
 ```
 
-### 5. 访问地址
+### 第八步：访问系统
 
-| 服务 | 地址 |
+| 服务 | 地址 | 说明 |
+|------|------|------|
+| 后台管理 | http://localhost:9528 | 管理员登录 |
+| 博客前台 | http://localhost:8080 | 博客展示 |
+
+**默认登录账号**：admin / 123456
+
+---
+
+## 前端开发模式（可选）
+
+如果需要修改前端代码并实时预览：
+
+```bash
+# 后台管理前端
+cd admin-vue
+npm install
+npm run dev    # 启动开发服务器，端口 9528
+
+# 博客前台前端
+cd fronted/ptu-blog-vue
+npm install
+npm run dev    # 启动开发服务器，端口 8080
+```
+
+**注意**：前台前端的 webpack-dev-server 版本较老，Node.js v18+ 可能有兼容性问题。推荐用 Node.js v14-v16，或者直接用 `node serve.js` 启动静态服务。
+
+---
+
+## 功能说明
+
+### 后台管理功能
+
+| 模块 | 功能 |
 |------|------|
-| 后台管理 | http://localhost:9528 |
-| 博客前台 | http://localhost:8080 |
+| 登录/退出 | 管理员登录、退出 |
+| 用户管理 | 用户列表、新增、修改、删除 |
+| 角色管理 | 角色列表、新增、修改、删除、状态变更 |
+| 菜单管理 | 菜单列表、树形结构、新增、修改、删除 |
+| 文章管理 | 文章列表、详情、修改、删除 |
+| 分类管理 | 分类列表、新增、修改、删除 |
+| 友链管理 | 友链列表、新增、修改、删除 |
 
-**默认账号**：admin / 123456
+### 博客前台功能
+
+| 功能 | 说明 |
+|------|------|
+| 首页 | 热门文章、文章列表 |
+| 文章详情 | Markdown 渲染、浏览量统计 |
+| 分类浏览 | 按分类查看文章 |
+| 友链页面 | 友链展示、友链评论 |
+| 评论系统 | 文章评论、友链评论、评论回复 |
 
 ---
 
@@ -83,7 +181,7 @@ node serve.js
 ### 后端修改
 
 #### 1. AdminLoginController.java
-- 登录接口路径从 `/login` 改为 `/user/login`（适配前端 `login.js` 中的 `/user/login`）
+- 登录接口路径从 `/login` 改为 `/user/login`（适配前端 login.js 中的请求路径）
 - 新增 `GET /getInfo` 接口，返回当前用户信息、角色、权限
 
 #### 2. admin/SecurityConfig.java
@@ -115,15 +213,17 @@ node serve.js
 
 | 表名 | 说明 | 备注 |
 |------|------|------|
-| user | 用户表 | admin 密码需为 BCrypt 加密 |
+| user | 用户表 | admin 密码为 BCrypt 加密 |
 | article | 文章表 | |
 | category | 分类表 | |
 | link | 友链表 | |
-| comment | 评论表 | |
-| menu | 菜单表 | |
+| comment | 评论表 | type=0 文章评论，type=1 友链评论 |
+| menu | 菜单表 | 0=目录，1=菜单，2=按钮 |
 | sys_role | 角色表 | |
 | sys_role_menu | 角色菜单关联 | 联合主键，无 id 列 |
 | sys_user_role | 用户角色关联 | 联合主键，无 id 列 |
+
+---
 
 ## 常见问题
 
@@ -151,6 +251,14 @@ npm run dev
 
 ### 6. Node.js 版本兼容
 前台前端 `fronted/ptu-blog-vue` 的 webpack-dev-server 版本较老，Node.js v18+ 可能有兼容性问题。推荐用 `node serve.js` 启动静态服务。
+
+### 7. Redis 启动失败
+确保 Redis 在运行且端口为 6379。如果修改了 Redis 端口，需要同步修改两个 `application.yml` 文件。
+
+### 8. 两个后端启动顺序
+建议先启动 blog（7777），再启动 admin（8989）。两个都需要 Redis 连接。
+
+---
 
 ## API 接口概览
 
