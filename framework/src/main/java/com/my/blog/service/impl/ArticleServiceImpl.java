@@ -60,7 +60,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     public ResponseResult articleList(Integer pageNum, Integer pageSize, Long categoryId) {
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(categoryId != 0, Article::getCategoryId, categoryId)
+        queryWrapper.eq(categoryId != null && categoryId != 0, Article::getCategoryId, categoryId)
                     .orderByDesc(Article::getIsTop);
 
         Page<Article> articlePage = new Page<>(pageNum, pageSize);

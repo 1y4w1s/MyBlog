@@ -26,6 +26,14 @@ yarn-error.log*
 uploads/
 jar_temp/
 
+# Others
+MyBlog-2026_6_9/
+MyBlog-clone/
+dump.rdb
+admin-vue/dist/
+fronted/ptu-blog-vue/dist/
+admin-vue/node_modules/
+
 # OS
 .DS_Store
 Thumbs.db
