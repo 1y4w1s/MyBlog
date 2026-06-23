@@ -27,7 +27,11 @@
 
 ```sql
 CREATE DATABASE blog DEFAULT CHARACTER SET utf8mb4;
--- 导入 sql 文件（如有）
+```
+
+然后导入初始化脚本（包含建表 + 初始数据）：
+```bash
+mysql -u root -p blog < blog/sql/blog.sql
 ```
 
 ### 2. 启动 Redis
