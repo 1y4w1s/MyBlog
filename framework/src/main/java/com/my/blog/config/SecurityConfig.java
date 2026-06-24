@@ -52,7 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/logout").authenticated()
             .antMatchers("/comment").authenticated()
             .antMatchers("/user/userInfo").authenticated()
-            .antMatchers("/", "/index.html", "/favicon.ico", "/static/**", "/user/register", "/category/getCategoryList", "/link/getAllLink", "/link/getLinkList", "/comment/commentList", "/comment/linkCommentList", "/article/hotArticleList", "/article/articleList", "/article/{id}", "/article/updateViewCount/**", "/upload").permitAll()
+            .antMatchers("/", "/index.html", "/favicon.ico", "/static/**", "/uploads/**", "/user/register", "/category/getCategoryList", "/link/getAllLink", "/link/getLinkList", "/comment/commentList", "/comment/linkCommentList", "/article/hotArticleList", "/article/articleList", "/article/{id}", "/article/updateViewCount/**", "/upload", "/comment").permitAll()
             .anyRequest().authenticated()
             .and()
             .headers().frameOptions().disable()

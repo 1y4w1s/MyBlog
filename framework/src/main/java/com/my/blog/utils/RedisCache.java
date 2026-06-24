@@ -113,4 +113,8 @@ public class RedisCache {
     public Collection<String> keys(final String pattern) {
         return doRedis(() -> redisTemplate.keys(pattern), localCache.keySet());
     }
+
+    public void incrementCacheMapValue(String key, String hKey, long delta) {
+        doRedisVoid(() -> redisTemplate.opsForHash().increment(key, hKey, delta));
+    }
 }

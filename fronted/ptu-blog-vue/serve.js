@@ -3,7 +3,7 @@ var fs = require('fs');
 var path = require('path');
 
 var dist = path.join(__dirname, 'dist');
-var port = 8080;
+var port = 8888;
 var staticExts = ['.html', '.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.ttf', '.woff', '.woff2', '.svg'];
 
 http.createServer(function (req, res) {

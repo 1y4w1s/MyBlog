@@ -20,15 +20,32 @@ dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+package-lock.json
 
 # Logs & runtime
 *.log
 uploads/
 jar_temp/
 
+# Redis
+dump.rdb
+
 # OS
 .DS_Store
 Thumbs.db
 
-# Local config (copy from *.example.yml)
+# Local config
 application-local.yml
+
+# Test / utility scripts
+clean_data.py
+import_sql.py
+test_api.py
+test_api_full.py
+test_new.py
+
+# Backup / reference (do not commit)
+Redis-x64-5.0.14.1/
+MyBlog-2026_6_9/
+MyBlog-clone/
+admin-vue-backup/
