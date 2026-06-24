@@ -1,0 +1,9 @@
+plugins:
+  - removeDimensions
+  - removeAttrs
+
+params:
+  removeDimensions: true
+  removeAttrs:
+    attrs:
+      - fill
